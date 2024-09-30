@@ -39,12 +39,20 @@ const tempDir = path.resolve(__dirname, './temp')
 const videoDir = path.resolve(__dirname, './video')
 
 app.post('/upload', (req, res) => {
-  const { fileName, fileType, chunkName } = req.body
+  const { fileName, chunkName } = req.body
   const { chunk } = req.files
   // 根据fileName生成hash文件夹名字
   const hashFolderName = CryptoJS.MD5(fileName),
     tempFolderPath = `${tempDir}/${hashFolderName}`,
     chunkFilePath = `${tempFolderPath}/${chunkName}`
+
+  if (!existsSync(videoDir)) {
+    mkdirSync(videoDir)
+  }
+
+  if (!existsSync(tempDir)) {
+    mkdirSync(tempDir)
+  }
 
   if (!existsSync(tempFolderPath)) {
     mkdirSync(tempFolderPath)
@@ -83,6 +91,7 @@ app.get('/merge', (req, res) => {
   if (!existsSync(videoFolderDir)) {
     mkdirSync(videoFolderDir)
   }
+
   fileList.sort((a, b) => {
     const reg = /_(\d+)/
     return reg.exec(a)[1] - reg.exec(b)[1]
